@@ -9,13 +9,13 @@
         .container { max-width: 500px; background: white; margin: 30px auto; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
         h1 { text-align: center; color: #2c3e50; }
         label { font-weight: bold; display: block; margin-top: 15px; }
-        input, select { width: 100%; padding: 10px; margin-top: 5px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        input { width: 100%; padding: 10px; margin-top: 5px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
         button { width: 100%; background-color: #27ae60; color: white; border: none; padding: 12px; margin-top: 20px; font-size: 16px; border-radius: 4px; cursor: pointer; }
         button:hover { background-color: #219653; }
         .list-section, .summary-section { margin-top: 30px; border-top: 2px solid #eee; padding-top: 15px; }
         ul { list-style: none; padding: 0; }
         li { background: #f9f9f9; padding: 10px; margin-bottom: 8px; border-left: 4px solid #27ae60; border-radius: 4px; display: flex; justify-content: space-between; }
-        .balance { font-size: 18px; font-weight: bold; color: #2c3e50; text-align: center; margin-top: 10px; }
+        .balance-item { font-size: 16px; margin: 5px 0; padding: 5px; background: #eef9f3; border-radius: 4px; }
     </style>
 </head>
 <body>
@@ -23,37 +23,106 @@
 <div class="container">
     <h1>Expense Splitter</h1>
     
-    <!-- Input Form -->
+    <!-- Input Fields -->
     <label for="payer">Who paid?</label>
     <input type="text" id="payer" placeholder="Enter name (e.g., Alex)">
 
-    <label for="amount">Amount ($ / ₹)</label>
+    <label for="amount">Amount (₹ / $)</label>
     <input type="number" id="amount" placeholder="Enter amount">
 
     <label for="description">For what?</label>
-    <input type="text" id="description" placeholder="e.g., Dinner, Rent">
+    <input type="text" id="description" placeholder="e.g., Dinner, Snacks">
 
     <button onclick="addExpense()">Add Expense</button>
 
-    <!-- Expense List -->
+    <!-- Expense History List -->
     <div class="list-section">
         <h3>Logged Expenses</h3>
-        <ul id="expenseList">
-            <!-- New items will appear here -->
-        </ul>
+        <ul id="expenseList"></ul>
     </div>
 
-    <!-- Final Summary Calculations -->
+    <!-- Live Calculation Dashboard -->
     <div class="summary-section">
-        <h3>Balances</h3>
-        <div id="balanceSummary" class="balance">No balances to show yet.</div>
+        <h3>Who Owes Who</h3>
+        <div id="balanceSummary">No balances calculated yet. Add an expense!</div>
     </div>
 </div>
 
 <script>
-    // We will write the math logic and functions here in the next step!
+    // System storage arrays
+    let expenses = [];
+
     function addExpense() {
-        alert("Button clicked! Next, we will connect the logic to split the money.");
+        const payerInput = document.getElementById('payer');
+        const amountInput = document.getElementById('amount');
+        const descInput = document.getElementById('description');
+
+        const payer = payerInput.value.trim();
+        const amount = parseFloat(amountInput.value);
+        const description = descInput.value.trim();
+
+        // Simple check to prevent empty entries
+        if (!payer || isNaN(amount) || amount <= 0 || !description) {
+            alert("Please fill out all fields with valid information!");
+            return;
+        }
+
+        // Save data into memory
+        expenses.push({ payer, amount, description });
+
+        // Update the screen interface visual list
+        const list = document.getElementById('expenseList');
+        const listItem = document.createElement('li');
+        listItem.innerHTML = `<span><strong>${payer}</strong> paid for ${description}</span> <span>₹${amount.toFixed(2)}</span>`;
+        list.appendChild(listItem);
+
+        // Clear forms for next entry
+        payerInput.value = '';
+        amountInput.value = '';
+        descInput.value = '';
+
+        // Run smart split mathematical logic
+        calculateBalances();
+    }
+
+    function calculateBalances() {
+        let totalTracking = {};
+        let distinctPeople = new Set();
+        let grandTotal = 0;
+
+        // Step A: Calculate how much total cash each unique person spent
+        expenses.forEach(exp => {
+            distinctPeople.add(exp.payer);
+            grandTotal += exp.amount;
+            if (!totalTracking[exp.payer]) totalTracking[exp.payer] = 0;
+            totalTracking[exp.payer] += exp.amount;
+        });
+
+        let participantCount = distinctPeople.size;
+        if (participantCount < 2) {
+            document.getElementById('balanceSummary').innerHTML = "Add expenses from at least 2 different people to see who owes who!";
+            return;
+        }
+
+        // Step B: Figure out the equal split target share per person
+        let fairSharePerPerson = grandTotal / participantCount;
+        let finalSummaryHTML = `<p><strong>Total Spent:</strong> ₹${grandTotal.toFixed(2)} (${participantCount} people split ₹${fairSharePerPerson.toFixed(2)} each)</p>`;
+
+        // Step C: Highlight who is owed cash vs who needs to pay back
+        distinctPeople.forEach(person => {
+            let userSpent = totalTracking[person] || 0;
+            let netBalance = userSpent - fairSharePerPerson;
+
+            if (netBalance > 0) {
+                finalSummaryHTML += `<div class="balance-item" style="color: #27ae60;"><strong>${person}</strong> is owed <strong>₹${netBalance.toFixed(2)}</strong> total.</div>`;
+            } else if (netBalance < 0) {
+                finalSummaryHTML += `<div class="balance-item" style="color: #c0392b;"><strong>${person}</strong> needs to pay back <strong>₹${Math.abs(netBalance).toFixed(2)}</strong>.</div>`;
+            } else {
+                finalSummaryHTML += `<div class="balance-item" style="color: #7f8c8d;"><strong>${person}</strong> is completely settled up.</div>`;
+            }
+        });
+
+        document.getElementById('balanceSummary').innerHTML = finalSummaryHTML;
     }
 </script>
 
