@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Splitter</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f7f6; color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 500px; background: white; margin: 30px auto; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #2c3e50; }
+        label { font-weight: bold; display: block; margin-top: 15px; }
+        input, select { width: 100%; padding: 10px; margin-top: 5px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        button { width: 100%; background-color: #27ae60; color: white; border: none; padding: 12px; margin-top: 20px; font-size: 16px; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #219653; }
+        .list-section, .summary-section { margin-top: 30px; border-top: 2px solid #eee; padding-top: 15px; }
+        ul { list-style: none; padding: 0; }
+        li { background: #f9f9f9; padding: 10px; margin-bottom: 8px; border-left: 4px solid #27ae60; border-radius: 4px; display: flex; justify-content: space-between; }
+        .balance { font-size: 18px; font-weight: bold; color: #2c3e50; text-align: center; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Expense Splitter</h1>
+    
+    <!-- Input Form -->
+    <label for="payer">Who paid?</label>
+    <input type="text" id="payer" placeholder="Enter name (e.g., Alex)">
+
+    <label for="amount">Amount ($ / ₹)</label>
+    <input type="number" id="amount" placeholder="Enter amount">
+
+    <label for="description">For what?</label>
+    <input type="text" id="description" placeholder="e.g., Dinner, Rent">
+
+    <button onclick="addExpense()">Add Expense</button>
+
+    <!-- Expense List -->
+    <div class="list-section">
+        <h3>Logged Expenses</h3>
+        <ul id="expenseList">
+            <!-- New items will appear here -->
+        </ul>
+    </div>
+
+    <!-- Final Summary Calculations -->
+    <div class="summary-section">
+        <h3>Balances</h3>
+        <div id="balanceSummary" class="balance">No balances to show yet.</div>
+    </div>
+</div>
+
+<script>
+    // We will write the math logic and functions here in the next step!
+    function addExpense() {
+        alert("Button clicked! Next, we will connect the logic to split the money.");
+    }
+</script>
+
+</body>
+</html>
